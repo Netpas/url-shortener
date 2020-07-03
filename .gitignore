@@ -1,0 +1,15 @@
+nbproject/
+.idea/
+.vscode/
+.settings/
+.DS_Store
+.buildpath
+.project
+*.swp
+
+vendor/
+.php_cs.cache
+codeception.yml
+*.bak
+
+# Important: Do **NOT** ignore `composer.lock`!
