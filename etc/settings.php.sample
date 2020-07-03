@@ -1,0 +1,112 @@
+<?php
+
+declare(strict_types=1);
+
+require __DIR__.'/../app/meta.php';
+
+// ---------------------------------------------------------------------
+// 配置信息
+// ---------------------------------------------------------------------
+// 这个文件最终是一个 return 语句，因此它是被设计为在赋值语句中 require 的。
+
+// (1). DEBUG
+// -----------------------------
+// Debug mode is mainly used to control the default logging level.
+define('DEBUG', true);
+
+// (2). Defaults
+// ---------------------------
+$_logDir    = getenv('LOG_PATH') ?: '/var/log';
+$_tmpDir    = sys_get_temp_dir();
+$_resources = [
+    'mysql:shortener' => [
+        'host'     => 'host.docker.internal',
+        'port'     => 3306,
+        'username' => 'username',
+        'password' => 's3cr3t',
+        'database' => 'shortener',
+    ],
+    'redis:shortener' => [
+        // @see: https://github.com/nrk/predis/wiki/Connection-Parameters
+        'scheme'   => 'tcp',
+        'host'     => 'host.docker.internal',
+        'port'     => 6379,
+        'database' => 0,
+        'password' => null,
+    ],
+];
+// 日志设置的默认值，我们有三种类型的日志机制，可以同时启用
+$_loggingSettings = [
+    // 为 true 时会将日志输出到 stderr
+    'stderr' => DEBUG,
+    // 同时有 path 和 filename 属性，将启用基于文件系统的日志机制
+    // 'path'   => $_logDir,
+    // 存在 syslogUdpHost 属性时启用基于 Syslog UDP 的日志机制
+    // 'syslogUdpHost' => 'logging.server',
+    // 'syslogUdpPort' => 514,
+    // 'syslogUdpTag' => 'php',
+];
+
+// (3). Tweak defaults according to the APP_STAGE
+// -----------------------------
+switch (APP_STAGE) {
+    case 'PRODUCTION':
+        break;
+    case 'STAGING':
+        break;
+    case 'TESTING':
+        break;
+    case 'DEVELOPMENT':
+        $_logDir = __DIR__.'/../logs';
+        $_tmpDir = __DIR__.'/../temp';
+        break;
+}
+
+// (X). Returns
+// -----------------------------
+return [
+    // 默认的日志配置
+    'logger' => [
+        'defaultSettings' => $_loggingSettings,
+    ],
+    // Web 服务
+    'webService' => [
+        'script' => __DIR__.'/../public/index.php',
+        'logger' => [
+            'filename' => APP_NAME.'.web.log',
+        ],
+    ],
+    // 任务运行器
+    'taskRunner' => [
+        'script' => __DIR__.'/../bin/task-runner.php',
+        'logger' => [
+            'filename' => APP_NAME.'.task.log',
+        ],
+    ],
+    // 异步任务
+    'taskMap' => [
+        'ClearObsoletes' => '',
+    ],
+    // 关系数据库
+    'database' => [
+        'connections' => [
+            'shortener' => $_resources['mysql:shortener'],
+        ],
+        'defaultSettings' => [
+            'driver'    => 'mysql',
+            'charset'   => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+        ],
+        'timezone'       => 'UTC',
+        'enableQueryLog' => true,
+        'logger'         => [
+            'filename' => APP_NAME.'.sql.log',
+        ],
+    ],
+    // Redis 数据库
+    'redis' => [
+        'connections' => [
+            'shortener' => $_resources['redis:shortener'],
+        ],
+    ],
+];
