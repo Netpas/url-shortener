@@ -25,7 +25,7 @@ class Shortener extends Base
     public function getAppByAuth(string $uuid, int $timestamp, string $digest)
     {
         $now = time();
-        if (abs($now - $timestamp) > 60) {
+        if (abs($now - $timestamp) > 60 * 15) {
             $this->warning('Invalid timestamp.');
 
             return [400, 'Bad Request'];
