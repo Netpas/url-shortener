@@ -11,6 +11,8 @@ use Slim\Routing\RouteCollectorProxy;
 
 /* @var \Slim\App $app */
 
+$app->get('/self', '\App\View\Base:meta');
+
 $app->group('/_', function (RouteCollectorProxy $group) {
     $group->get('/meta', '\App\View\Base:meta');
     $group->post('/task', '\App\View\Task:task');

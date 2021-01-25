@@ -45,7 +45,9 @@ class Service extends Base
      */
     public function submit(Request $request, Response $response, array $args): Response
     {
+        $ts0 = microtime(true);
         Env::bootstrapDatabase();
+        $ts1 = microtime(true);
         // 表单或者 JSON 都支持
         $params    = $request->getParsedBody();
         $uuid      = strval(jmesPath('app', $params) ?? '');
@@ -76,6 +78,7 @@ class Service extends Base
         if (is_array($app)) {
             return $this->fault($response, $app);
         }
+        $ts2 = microtime(true);
         // 构建短链
         $item   = Url::create($target, $app, $expiredAt, $duplicable);
         $result = [
@@ -87,6 +90,14 @@ class Service extends Base
                 'expired_at' => $item->expired_at,
             ],
         ];
+        $ts3 = microtime(true);
+        $ctx = [
+            'started'  => $ts0,
+            'prepare'  => $ts1 - $ts0,
+            'generate' => $ts2 - $ts1,
+            'save'     => $ts3 - $ts2,
+        ];
+        $this->info($item->token.' MADE.', $ctx);
 
         return $this->jsonify($response, $result);
     }

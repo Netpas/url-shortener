@@ -6,6 +6,7 @@ namespace App\Common;
 
 use App\Env;
 use Slim\Error\Renderers\JsonErrorRenderer;
+use Slim\Exception\HttpNotFoundException;
 use Slim\Handlers\ErrorHandler as BaseErrorHandler;
 use Slim\Interfaces\ErrorRendererInterface;
 
@@ -41,10 +42,18 @@ class ErrorHandler extends BaseErrorHandler
     protected function logError(string $error): void
     {
         $logger = Env::getLogger();
-        if (null === $logger) {
-            error_log($error);
+        if ($this->exception instanceof HttpNotFoundException) {
+            if (null === $logger) {
+                error_log('404 Not Found');
+            } else {
+                $logger->error('404 Not Found');
+            }
         } else {
-            $logger->error($error);
+            if (null === $logger) {
+                error_log($error);
+            } else {
+                $logger->error($error);
+            }
         }
     }
 }

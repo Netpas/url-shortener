@@ -112,9 +112,10 @@ class Base extends CommonBase
     public function meta(Request $request, Response $response, array $args): Response
     {
         $data = [
-            'name'    => APP_NAME,
+            'whoami'  => APP_NAME,
             'version' => APP_VERSION,
             'stage'   => APP_STAGE,
+            'branch'  => 'master',
         ];
 
         return $this->jsonify($response, $data, true);

@@ -9,7 +9,7 @@ declare(strict_types=1);
 // (1). Application
 // -----------------------------
 define('APP_NAME', 'URL-Shortener');
-define('APP_VERSION', '0.5.0');
+define('APP_VERSION', '0.6.1');
 
 // (2). APP_STAGE
 // -----------------------------

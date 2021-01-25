@@ -66,14 +66,16 @@ class Url extends Model
             $expiredAt = new Carbon();
             $expiredAt = $expiredAt->addCentury();
         }
-        if (!$duplicable) {
-            $item = Url::where('target', $target)
-            ->where('app_id', $app->id)
-            ->where('disabled', false)
-            ->first();
-        } else {
-            $item = null;
-        }
+        // 这会引起严重的性能问题，屏蔽之
+        // if (!$duplicable) {
+        //     $item = Url::where('target', $target)
+        //     ->where('app_id', $app->id)
+        //     ->where('disabled', false)
+        //     ->first();
+        // } else {
+        //     $item = null;
+        // }
+        $item = null;
         if (null === $item) {
             $item             = new Url();
             $item->app_id     = $app->id;
@@ -89,6 +91,7 @@ class Url extends Model
                 } catch (PDOException $err) {
                     if (!strpos($err->getMessage(), '1062 Duplicate entry')) {
                         throw $err;
+                    } else {
                     }
                 }
             }
