@@ -13,3 +13,6 @@ codeception.yml
 *.bak
 
 # Important: Do **NOT** ignore `composer.lock`!
+Dockerfile
+docker-compose.yml
+phpdocker/
